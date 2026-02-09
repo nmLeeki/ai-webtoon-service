@@ -8,17 +8,17 @@ from datetime import datetime
 from pathlib import Path
 
 # UTF-8 encoding
-sys.stdout.reconfigure(encoding='utf-8')
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except (AttributeError, TypeError):
+    pass
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
-
-from core.config import Config
-from core.database import Database
-from services.story_generator import StoryGenerator
-from services.image_generator import ImageGenerator
-from services.image_composer import ImageComposer
-from services.instagram_poster import InstagramPoster
+from src.core.config import Config
+from src.core.database import Database
+from src.services.story_generator import StoryGenerator
+from src.services.image_generator import ImageGenerator
+from src.services.image_composer import ImageComposer
+from src.services.instagram_poster import InstagramPoster
 
 
 def run_pipeline(topic: str = "직장인 공감", style: str = "유머", 
@@ -177,8 +177,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    run_pipeline(
+    result = run_pipeline(
         topic=args.topic,
         style=args.style,
         post_to_instagram=args.post
     )
+    
+    # Exit with appropriate code for CI
+    if not result.get("success", False):
+        sys.exit(1)
+    sys.exit(0)

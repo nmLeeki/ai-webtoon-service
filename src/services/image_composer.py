@@ -98,7 +98,17 @@ class ImageComposer:
                       fill=bg_color)
         
         try:
-            font = ImageFont.truetype("malgun.ttf", 80)
+            # Try multiple fonts for cross-platform compatibility
+            fonts_to_try = ["malgun.ttf", "arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "DejaVuSans.ttf"]
+            font = None
+            for font_name in fonts_to_try:
+                try:
+                    font = ImageFont.truetype(font_name, 80)
+                    break
+                except:
+                    continue
+            if not font:
+                font = ImageFont.load_default()
         except:
             font = ImageFont.load_default()
         
@@ -107,7 +117,16 @@ class ImageComposer:
     def _add_title(self, draw: ImageDraw, title: str):
         """Add title at the top"""
         try:
-            font = ImageFont.truetype("malgun.ttf", 50)
+            fonts_to_try = ["malgun.ttf", "arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "DejaVuSans.ttf"]
+            font = None
+            for font_name in fonts_to_try:
+                try:
+                    font = ImageFont.truetype(font_name, 50)
+                    break
+                except:
+                    continue
+            if not font:
+                font = ImageFont.load_default()
         except:
             font = ImageFont.load_default()
         
@@ -125,7 +144,16 @@ class ImageComposer:
                           pos: Tuple[int, int], emotion: str):
         """Add speech bubble to panel"""
         try:
-            font = ImageFont.truetype("malgun.ttf", 35)
+            fonts_to_try = ["malgun.ttf", "arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "DejaVuSans.ttf"]
+            font = None
+            for font_name in fonts_to_try:
+                try:
+                    font = ImageFont.truetype(font_name, 35)
+                    break
+                except:
+                    continue
+            if not font:
+                font = ImageFont.load_default()
         except:
             font = ImageFont.load_default()
         
