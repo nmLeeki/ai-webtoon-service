@@ -55,7 +55,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add data/database.db
+          git add -f data/database.db
           git commit -m "Update database with new webtoon" || echo "No changes to commit"
           git push
       
