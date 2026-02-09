@@ -99,7 +99,14 @@ class ImageComposer:
         
         try:
             # Try multiple fonts for cross-platform compatibility
-            fonts_to_try = ["malgun.ttf", "arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "DejaVuSans.ttf"]
+            fonts_to_try = [
+                "malgun.ttf", 
+                "arial.ttf", 
+                "/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf",
+                "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 
+                "DejaVuSans.ttf"
+            ]
             font = None
             for font_name in fonts_to_try:
                 try:

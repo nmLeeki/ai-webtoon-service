@@ -92,7 +92,9 @@ def run_pipeline(topic: str = "직장인 공감", style: str = "유머",
                 panel_images.append(str(image_path))
                 
             except Exception as e:
-                print(f"  ❌ 패널 {i+1} 이미지 생성 실패: {e}")
+                print(f"  ❌ 패널 {i+1} 이미지 생성 실패: {str(e)}")
+                import traceback
+                traceback.print_exc()
                 print(f"  ⚠️ Placeholder 사용")
                 # Create placeholder
                 from PIL import Image
