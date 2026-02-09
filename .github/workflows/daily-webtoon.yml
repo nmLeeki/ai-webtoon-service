@@ -1,0 +1,73 @@
+name: Daily Webtoon Generator
+
+on:
+  schedule:
+    # 매일 UTC 00:00 (KST 09:00)
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 수동 실행 가능
+    inputs:
+      topic:
+        description: '웹툰 주제'
+        required: false
+        default: '직장인 공감'
+      style:
+        description: '웹툰 스타일'
+        required: false
+        default: '유머'
+
+jobs:
+  generate-and-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run webtoon pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: |
+          python -m src.main --topic "${{ github.event.inputs.topic || '직장인 공감' }}" --style "${{ github.event.inputs.style || '유머' }}"
+      
+      - name: Upload webtoon artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: webtoons-${{ github.run_number }}
+          path: |
+            data/webtoons/
+            data/stories/
+          retention-days: 30
+      
+      - name: Commit database changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/database.db
+          git commit -m "Update database with new webtoon" || echo "No changes to commit"
+          git push
+      
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '웹툰 생성 실패 - ' + new Date().toISOString(),
+              body: '워크플로우 로그를 확인하세요: ' + context.payload.repository.html_url + '/actions/runs/' + context.runId,
+              labels: ['bug', 'automation']
+            })
